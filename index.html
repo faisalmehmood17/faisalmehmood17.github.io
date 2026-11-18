@@ -450,6 +450,37 @@
     .layout { padding: 0 20px 32px; }
   }
 </style>
+<style id="photo-3d">
+  /* 3D profile photo */
+  .hero-inner { perspective: 1000px; }
+  .hero-photo {
+    position: relative; transform-style: preserve-3d; will-change: transform;
+    transform: rotateY(-12deg) rotateX(6deg);
+    transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;
+    box-shadow:
+      1px 1px 0 #E39A12, 2px 2px 0 #D18C0E, 3px 3px 0 #BF7F0C, 4px 4px 0 #AD720A,
+      5px 5px 0 #9B6508, 6px 6px 0 #895806, 7px 7px 0 #774C05,
+      18px 26px 40px rgba(0,0,0,0.55), 0 0 60px rgba(252,163,17,0.18) !important;
+    animation: photo-float 7s ease-in-out infinite alternate;
+    cursor: zoom-in;
+  }
+  .hero-photo.tilting { animation: none; transition: transform .12s ease-out, box-shadow .2s; }
+  .hero-photo img { transform: translateZ(0); }
+  .hero-photo .photo-glare {
+    position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+    background: radial-gradient(circle at var(--gx, 30%) var(--gy, 20%), rgba(255,255,255,0.38), rgba(255,255,255,0) 55%);
+    mix-blend-mode: soft-light; opacity: .55; transition: opacity .3s;
+  }
+  .hero-photo.tilting .photo-glare { opacity: 1; }
+  @keyframes photo-float {
+    0%   { transform: rotateY(-12deg) rotateX(6deg)  translateY(0); }
+    50%  { transform: rotateY(-4deg)  rotateX(2deg)  translateY(-6px); }
+    100% { transform: rotateY(8deg)   rotateX(-3deg) translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-photo { animation: none; }
+  }
+</style>
 </head>
 <body>
 
@@ -755,6 +786,30 @@ referrerPolicy="no-referrer-when-downgrade"></a></div></noscript>
     if (p) p.addEventListener('click', function(){
       if (window.clarity) { window.clarity('event', 'photo_click'); window.clarity('set', 'photo_click', 'yes'); }
     });
+  })();
+</script>
+<script id="photo-3d-js">
+  (function () {
+    var card = document.querySelector('.hero-photo');
+    if (!card) return;
+    var glare = document.createElement('div');
+    glare.className = 'photo-glare';
+    card.appendChild(glare);
+    var MAX = 14;
+    function tilt(clientX, clientY) {
+      var r = card.getBoundingClientRect();
+      var x = (clientX - r.left) / r.width, y = (clientY - r.top) / r.height;
+      x = Math.min(Math.max(x, 0), 1); y = Math.min(Math.max(y, 0), 1);
+      card.classList.add('tilting');
+      card.style.transform = 'rotateY(' + ((x - 0.5) * 2 * MAX).toFixed(2) + 'deg) rotateX(' + ((0.5 - y) * 2 * MAX).toFixed(2) + 'deg) scale(1.04)';
+      card.style.setProperty('--gx', (x * 100).toFixed(1) + '%');
+      card.style.setProperty('--gy', (y * 100).toFixed(1) + '%');
+    }
+    function reset() { card.classList.remove('tilting'); card.style.transform = ''; }
+    card.addEventListener('pointermove', function (e) { if (e.pointerType === 'mouse') tilt(e.clientX, e.clientY); });
+    card.addEventListener('pointerleave', reset);
+    card.addEventListener('touchmove', function (e) { var t = e.touches[0]; if (t) tilt(t.clientX, t.clientY); }, { passive: true });
+    card.addEventListener('touchend', reset);
   })();
 </script>
 </body>
