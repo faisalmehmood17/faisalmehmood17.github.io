@@ -113,6 +113,155 @@
     input, textarea, select { font-size: 16px !important; }
   }
 </style>
+<style id="glass-theme">
+  /* ===== GLASSMORPHISM THEME ===== */
+  :root {
+    --g-bg: #0A1428;
+    --g-amber: #FCA311;
+    --g-text: rgba(255,255,255,0.92);
+    --g-text-2: rgba(255,255,255,0.72);
+    --g-text-3: rgba(255,255,255,0.52);
+    --g-panel: rgba(255,255,255,0.07);
+    --g-panel-2: rgba(255,255,255,0.11);
+    --g-line: rgba(255,255,255,0.16);
+    --g-blur: blur(18px) saturate(150%);
+  }
+  html { background: var(--g-bg); }
+  body { background: transparent !important; color: var(--g-text); position: relative; min-height: 100vh; }
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(38vmax 38vmax at 8% 12%, rgba(252,163,17,0.38), transparent 62%),
+      radial-gradient(42vmax 42vmax at 92% 22%, rgba(56,120,255,0.42), transparent 62%),
+      radial-gradient(36vmax 36vmax at 70% 92%, rgba(0,190,200,0.26), transparent 62%),
+      radial-gradient(30vmax 30vmax at 18% 88%, rgba(150,90,255,0.24), transparent 62%),
+      linear-gradient(160deg, #0A1428 0%, #10224A 55%, #0A1428 100%);
+  }
+
+  /* Shared glass surface */
+  nav, .stat-bar, .sidebar, .main, .footer,
+  .cert-card, .form-card, .endorsement-card, .lb-inner,
+  .expertise-card, .project-pill, .exp-context, .coming-soon, .photo-placeholder {
+    background: var(--g-panel) !important;
+    -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
+    border: 1px solid var(--g-line) !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.10) !important;
+  }
+
+  /* Nav: floating glass bar */
+  nav { border-width: 0 0 1px 0 !important; border-radius: 0; background: rgba(10,20,40,0.45) !important; box-shadow: 0 4px 24px rgba(0,0,0,0.25) !important; }
+  .nav-links a { color: var(--g-text-2) !important; }
+  .nav-links a:hover, .nav-links a.active { color: var(--g-amber) !important; }
+
+  /* Heroes sit directly on the background */
+  .hero, .page-header { background: transparent !important; }
+  .hero::before, .hero::after, .page-header::before { display: none !important; }
+  .hero h1, .page-header h1 { color: #fff !important; }
+  .hero-title, .page-header p, .hero-meta span { color: var(--g-text-2) !important; }
+  .hero-summary { color: var(--g-text) !important; background: rgba(255,255,255,0.05); -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
+    border: 1px solid var(--g-line); border-left: 3px solid var(--g-amber) !important; border-radius: 16px; padding: 18px 22px !important; }
+  .hero-photo { border: 1px solid rgba(255,255,255,0.25) !important; box-shadow: 0 16px 48px rgba(0,0,0,0.45) !important; -webkit-mask-image: none !important; mask-image: none !important; border-radius: 22px !important; }
+  .back-link { color: var(--g-text-2) !important; }
+  .back-link:hover { color: var(--g-amber) !important; }
+  .project-hero-badge, .hero .hero-badge { -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur); }
+
+  /* Stat bar: glass strip with breathing room */
+  .stat-bar { max-width: 960px; margin: 0 auto 24px; border-radius: 18px; padding: 14px 24px !important; }
+  .stat-num { color: #fff !important; font-size: 20px !important; }
+  .stat-label { color: var(--g-text-3) !important; font-size: 10px !important; }
+
+  /* Two-column body as separate glass panels */
+  .layout { gap: 20px !important; padding: 0 0 40px; }
+  .sidebar, .main { border-radius: 22px; }
+  .main { background: var(--g-panel) !important; color: var(--g-text); }
+  .skill-bar { background: rgba(255,255,255,0.10) !important; }
+  .skill-name, .edu-degree, .cert-link { color: var(--g-text) !important; }
+  .edu-uni, .cert-year { color: var(--g-text-3) !important; }
+  .cert-icon { background: rgba(255,255,255,0.10) !important; border: 1px solid var(--g-line); }
+  .tag { background: rgba(252,163,17,0.10) !important; }
+
+  /* Section headings */
+  .section-title { color: #fff !important; }
+
+  /* Experience */
+  .exp-card { border-left-color: rgba(255,255,255,0.18) !important; }
+  .exp-role { color: #fff !important; }
+  .exp-org { color: var(--g-text-3) !important; }
+  .exp-org a { color: var(--g-text-2) !important; }
+  .exp-context { color: var(--g-text-2) !important; border-left: 2px solid var(--g-amber) !important; border-radius: 12px !important; box-shadow: none !important; background: rgba(255,255,255,0.05) !important; }
+  .exp-bullets li { color: var(--g-text-2) !important; }
+  .exp-period { background: rgba(252,163,17,0.16) !important; color: #FFC04D !important; border: 1px solid rgba(252,163,17,0.4); }
+
+  /* Expertise + project tiles */
+  .expertise-card, .project-pill { border-radius: 14px !important; color: var(--g-text) !important; box-shadow: none !important; transition: background .2s, transform .2s, border-color .2s; }
+  .expertise-card .icon-dot { background: var(--g-amber) !important; }
+  .project-pill:hover, .expertise-card:hover { background: var(--g-panel-2) !important; border-color: rgba(252,163,17,0.45) !important; transform: translateY(-2px); }
+  .project-pill .donor { color: var(--g-text-3) !important; }
+
+  /* Certifications page */
+  .tab-bar, .sub-tab-bar { border-bottom-color: var(--g-line) !important; }
+  .tab-btn, .sub-tab-btn { color: var(--g-text-3) !important; }
+  .tab-btn.active, .sub-tab-btn.active { color: #fff !important; border-bottom-color: var(--g-amber) !important; }
+  .tab-btn:hover:not(.active), .sub-tab-btn:hover:not(.active) { color: var(--g-text) !important; }
+  .cert-card { border-radius: 18px !important; overflow: hidden; }
+  .cert-card:hover { background: var(--g-panel-2) !important; border-color: rgba(252,163,17,0.45) !important; }
+  .cert-thumb { border-bottom: 1px solid var(--g-line) !important; }
+  .cert-name { color: #fff !important; }
+  .cert-issuer-badge { background: rgba(255,255,255,0.92) !important; box-shadow: 0 1px 6px rgba(0,0,0,0.2); }
+  .cert-meta, .cert-pdu { color: var(--g-text-3) !important; }
+  .view-btn { color: #fff !important; border-color: rgba(255,255,255,0.35) !important; background: rgba(255,255,255,0.06) !important; }
+  .cert-card:hover .view-btn { background: var(--g-amber) !important; color: #0A1428 !important; border-color: var(--g-amber) !important; }
+  .lightbox, .photo-lightbox { background: rgba(5,10,22,0.72) !important; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .lb-inner { background: rgba(20,33,61,0.75) !important; border-radius: 18px !important; overflow: hidden; }
+  .lb-header { background: rgba(255,255,255,0.06) !important; border-bottom: 1px solid var(--g-line); }
+
+  /* Endorsements page */
+  .form-card, .endorsement-card { border-radius: 20px !important; }
+  .form-card h2, .endorser-name { color: #fff !important; }
+  .form-card .form-sub, .endorser-role, .field-hint { color: var(--g-text-3) !important; }
+  .form-group label { color: var(--g-text-2) !important; }
+  .form-group input, .form-group textarea, .edit-form textarea {
+    background: rgba(255,255,255,0.06) !important; color: #fff !important;
+    border: 1px solid var(--g-line) !important; border-radius: 12px !important; }
+  .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(255,255,255,0.38) !important; }
+  .form-group input:focus, .form-group textarea:focus { border-color: var(--g-amber) !important; background: rgba(255,255,255,0.10) !important; outline: none; }
+  .endorsement-text { color: var(--g-text-2) !important; }
+  .endorsement-date { color: var(--g-text-3) !important; }
+  .endorsement-card::before { color: rgba(255,255,255,0.08) !important; }
+  .endorsement-card.pending { border-style: dashed !important; border-color: rgba(252,163,17,0.5) !important; }
+  .admin-btn { color: var(--g-text-3) !important; border-color: var(--g-line) !important; }
+  .admin-btn:hover { background: rgba(255,255,255,0.08) !important; color: #fff !important; }
+  .loading-state, .empty-state, .endorsement-count { color: var(--g-text-3) !important; }
+
+  /* Project pages */
+  .coming-soon { border-radius: 20px; padding: 40px 28px !important; color: var(--g-text-2) !important; }
+  .coming-soon h2 { color: #fff !important; }
+  .coming-soon p { color: var(--g-text-2) !important; }
+  .photo-placeholder { border-style: dashed !important; color: var(--g-text-3) !important; }
+  .section-line { background: var(--g-amber) !important; }
+
+  /* Footer */
+  .footer { border-width: 1px 0 0 0 !important; background: rgba(10,20,40,0.45) !important; box-shadow: none !important; }
+  .footer-name { color: var(--g-text) !important; }
+  .footer-text, .footer-text a { color: var(--g-text-3) !important; }
+
+  /* Browsers without blur support: use a solid tint instead */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    nav, .stat-bar, .sidebar, .main, .cert-card, .form-card, .endorsement-card, .coming-soon { background: rgba(20,33,61,0.88) !important; }
+  }
+
+  @media (max-width: 700px) {
+    .stat-bar { margin: 0 12px 16px; }
+    .layout { padding: 0 12px 28px; gap: 16px !important; }
+    .hero-summary { padding: 14px 16px !important; }
+    .hero-photo { border-radius: 16px !important; }
+    :root { --g-blur: blur(12px) saturate(140%); }
+  }
+  @media (max-width: 960px) and (min-width: 701px) {
+    .stat-bar { margin: 0 20px 20px; }
+    .layout { padding: 0 20px 32px; }
+  }
+</style>
 </head>
 <body>
 
