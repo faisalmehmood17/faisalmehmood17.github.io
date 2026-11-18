@@ -708,8 +708,10 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, deleteDoc, updateDoc, doc as firestoreDoc, orderBy, query, serverTimestamp }
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, updateDoc, doc as firestoreDoc, orderBy, query, where, serverTimestamp }
     from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+    from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyB7ggUNum48xyhgrdC5IMcQ1GEVk29BOJw",
@@ -723,6 +725,9 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  const auth = getAuth(app);
+  // Only this Google account can manage endorsements (must match the Firestore rules)
+  const ADMIN_EMAIL = 'faisalmehmood.ce@gmail.com';
   let isAdmin = false;
 
   function showToast(msg, duration = 4500) {
@@ -741,25 +746,38 @@
     setTimeout(() => el.classList.remove('show'), happy ? 3100 : 5400);
   }
 
-  window.toggleAdmin = function() {
-    if (isAdmin) {
-      isAdmin = false;
-      document.getElementById('endorsements-list').classList.remove('admin-mode');
-      document.getElementById('admin-btn').classList.remove('active');
-      document.getElementById('admin-btn').textContent = 'Admin';
-      return;
-    }
-    const pwd = prompt('Enter admin password:');
-    if (pwd === 'Delete') {
-      isAdmin = true;
-      document.getElementById('endorsements-list').classList.add('admin-mode');
-      document.getElementById('admin-btn').classList.add('active');
-      document.getElementById('admin-btn').textContent = 'Exit Admin';
-      loadEndorsements();
-    } else if (pwd !== null) {
-      alert('Incorrect password.');
+  function setAdminUi(on) {
+    isAdmin = on;
+    document.getElementById('endorsements-list').classList.toggle('admin-mode', on);
+    document.getElementById('admin-btn').classList.toggle('active', on);
+    document.getElementById('admin-btn').textContent = on ? 'Exit Admin' : 'Admin';
+  }
+
+  // Admin sign-in with Google; access is decided by the signed-in account, not a password
+  window.toggleAdmin = async function() {
+    if (isAdmin) { await signOut(auth); return; }
+    try {
+      await signInWithPopup(auth, new GoogleAuthProvider());
+    } catch (e) {
+      if (e && e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
+        alert('Sign-in failed (' + (e.code || 'unknown error') + ').');
+      }
     }
   };
+
+  let authReady = false;
+  onAuthStateChanged(auth, async (user) => {
+    const ok = !!(user && user.emailVerified && (user.email || '').toLowerCase() === ADMIN_EMAIL);
+    if (user && !ok) {
+      alert('This Google account is not allowed to manage endorsements.');
+      await signOut(auth);
+      return;
+    }
+    const changed = ok !== isAdmin || !authReady;
+    authReady = true;
+    setAdminUi(ok);
+    if (changed) loadEndorsements();
+  });
 
   window.editEndorsement = function(docId, cardEl) {
     const textEl = cardEl.querySelector('.endorsement-text');
@@ -863,8 +881,15 @@
     const list = document.getElementById('endorsements-list');
     const countEl = document.getElementById('endorsement-count');
     try {
-      const q = query(collection(db, 'endorsements'), orderBy('createdAt', 'desc'));
+      // Visitors can only read approved endorsements; the admin reads everything
+      const q = isAdmin
+        ? query(collection(db, 'endorsements'), orderBy('createdAt', 'desc'))
+        : query(collection(db, 'endorsements'), where('status', '==', 'approved'));
       const snap = await getDocs(q);
+      if (isAdmin) {
+        // One-time fix: older endorsements without a status were treated as approved
+        snap.forEach(d => { if (!d.data().status) updateDoc(firestoreDoc(db, 'endorsements', d.id), { status: 'approved' }).catch(() => {}); });
+      }
 
       const approved = [];
       const pending = [];
@@ -873,6 +898,8 @@
         if (!data.status || data.status === 'approved') approved.push({ id: d.id, ...data });
         else pending.push({ id: d.id, ...data });
       });
+      const tsOf = x => (x.createdAt && x.createdAt.toMillis) ? x.createdAt.toMillis() : 0;
+      approved.sort((a, b) => tsOf(b) - tsOf(a));
 
       list.innerHTML = '';
 
@@ -1010,8 +1037,6 @@
     btn.disabled = false;
     btn.textContent = 'Submit Endorsement';
   };
-
-  loadEndorsements();
 </script>
 
 <!-- Default Statcounter code for My Portfolio https://faisalmehmood17.github.io
